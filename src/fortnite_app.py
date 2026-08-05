@@ -10,7 +10,7 @@ from flask import (
     jsonify,
 )
 
-from fortnite_api import FortniteApiError, fetch_progress
+from .fortnite_api import FortniteApiError, fetch_progress
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -70,9 +70,7 @@ def init_db():
     conn.close()
 
 
-@app.before_first_request
-def ensure_db():
-    init_db()
+init_db()
 
 
 @app.route("/fortnite", methods=["GET"])
