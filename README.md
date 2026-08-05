@@ -81,6 +81,15 @@ The full Sprite Collector backend is a Flask app in `src/fortnite_app.py`. You c
 
 If you want to use the full backend instead of the GitHub Pages preview, access Render's generated service URL and point your app there.
 
+### Automatic deployment from GitHub
+This repository now includes a GitHub Actions workflow that can trigger a Render deploy whenever `master` is pushed.
+
+To use it, add these repository secrets in GitHub:
+- `RENDER_API_KEY` — your Render API key
+- `RENDER_SERVICE_ID` — the ID of your Render web service
+
+The workflow file is located at `.github/workflows/render-deploy.yml`.
+
 ## Backend deployment files
 This repository includes a `Procfile` and a `render.yaml` file so Render can start the Flask backend automatically.
 
