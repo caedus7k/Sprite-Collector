@@ -162,6 +162,18 @@
             <div class="note" id="note-area">
                 Loading your Fortnite progress... Please wait.
             </div>
+
+            <div class="card" style="margin-top:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>Sprites</strong>
+                    <div>
+                        <a href="{{ url_for('fortnite_account') }}"><button type="button">Account</button></a>
+                        <button id="save-list" type="button">Save my list</button>
+                    </div>
+                </div>
+
+                <div id="sprites-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:1rem; margin-top:1rem;"></div>
+            </div>
         </div>
     </div>
 
@@ -176,6 +188,11 @@
         const spriteProgressLabel = document.getElementById("sprite-progress-label");
         const battlePassProgress = document.getElementById("battlepass-progress");
         const battlePassProgressLabel = document.getElementById("battlepass-progress-label");
+        const spritesContainer = document.getElementById('sprites-container');
+        const saveListButton = document.getElementById('save-list');
+
+        let sprites = [];
+        let userList = {};
 
         async function loadProgress() {
             noteArea.textContent = "Fetching the latest progress from Fortnite...";
@@ -207,8 +224,127 @@
             }
         }
 
+        async function loadSprites() {
+            try {
+                const res = await fetch('/fortnite/api/sprites');
+                const data = await res.json();
+                if (res.ok) {
+                    sprites = data;
+                    renderSprites();
+                    await loadUserList();
+                } else {
+                    console.error(data);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function renderSprites() {
+            spritesContainer.innerHTML = '';
+            sprites.forEach(s => {
+                const card = document.createElement('div');
+                card.style.background = '#0e1a32';
+                card.style.border = '1px solid #233b67';
+                card.style.padding = '0.6rem';
+                card.style.borderRadius = '10px';
+
+                const img = document.createElement('img');
+                img.src = s.image.replace('/spritecollector', 'https://caedus7k.github.io/Sprite-Collector');
+                img.alt = s.name;
+                img.style.width = '100%';
+                img.style.borderRadius = '8px';
+                card.appendChild(img);
+
+                const title = document.createElement('div');
+                title.textContent = s.name + (s.status === 'planned' ? ' (planned)' : '');
+                title.style.marginTop = '0.5rem';
+                card.appendChild(title);
+
+                const cbRow = document.createElement('div');
+                cbRow.style.display = 'flex';
+                cbRow.style.gap = '0.5rem';
+                cbRow.style.marginTop = '0.5rem';
+
+                const collected = document.createElement('label');
+                const cbox = document.createElement('input');
+                cbox.type = 'checkbox';
+                cbox.dataset.sprite = s.id;
+                collected.appendChild(cbox);
+                collected.appendChild(document.createTextNode(' Collected'));
+
+                const mastered = document.createElement('label');
+                const mbox = document.createElement('input');
+                mbox.type = 'checkbox';
+                mbox.dataset.sprite = s.id;
+                mastered.appendChild(mbox);
+                mastered.appendChild(document.createTextNode(' Mastered'));
+
+                cbRow.appendChild(collected);
+                cbRow.appendChild(mastered);
+                card.appendChild(cbRow);
+
+                spritesContainer.appendChild(card);
+            });
+            applyUserListToUI();
+            attachCheckboxHandlers();
+        }
+
+        function applyUserListToUI() {
+            sprites.forEach(s => {
+                const collectedBox = document.querySelector(`input[type=checkbox][data-sprite="${s.id}"]`);
+                const masteredBox = Array.from(document.querySelectorAll(`input[type=checkbox][data-sprite="${s.id}"]`))[1];
+                const state = userList[s.id] || {collected:false, mastered:false};
+                if (collectedBox) collectedBox.checked = state.collected;
+                if (masteredBox) masteredBox.checked = state.mastered;
+            });
+        }
+
+        function attachCheckboxHandlers() {
+            document.querySelectorAll('input[type=checkbox][data-sprite]').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const spriteId = cb.dataset.sprite;
+                    // update userList object
+                    if (!userList[spriteId]) userList[spriteId] = {collected:false, mastered:false};
+                    const boxes = Array.from(document.querySelectorAll(`input[type=checkbox][data-sprite="${spriteId}"]`));
+                    userList[spriteId].collected = boxes[0].checked;
+                    userList[spriteId].mastered = boxes[1].checked;
+                });
+            });
+        }
+
+        async function loadUserList() {
+            try {
+                const res = await fetch('/fortnite/api/user/list');
+                if (res.status === 401) {
+                    // not authenticated
+                    userList = {};
+                    applyUserListToUI();
+                    return;
+                }
+                const data = await res.json();
+                userList = data || {};
+                applyUserListToUI();
+            } catch (err) { console.error(err); }
+        }
+
+        async function saveUserList() {
+            try {
+                const res = await fetch('/fortnite/api/user/list', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(userList)});
+                if (!res.ok) {
+                    const err = await res.json();
+                    alert('Save failed: ' + (err.error || res.statusText));
+                } else {
+                    alert('Saved');
+                }
+            } catch (err) { alert('Save error: ' + err); }
+        }
+
+        saveListButton.addEventListener('click', async () => {
+            await saveUserList();
+        });
+
         refreshButton.addEventListener("click", loadProgress);
         loadProgress();
+        loadSprites();
         setInterval(loadProgress, 15000);
     </script>
 </body>

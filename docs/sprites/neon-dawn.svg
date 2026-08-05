@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <rect width="240" height="240" rx="24" fill="#071022" />
+  <rect x="40" y="60" width="160" height="80" rx="12" fill="#6df0ff" opacity="0.9"/>
+  <text x="50%" y="220" font-size="18" text-anchor="middle" fill="#c8fbff">Neon Dawn (planned)</text>
+</svg>

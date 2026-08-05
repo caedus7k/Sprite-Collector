@@ -45,7 +45,23 @@ python src/fortnite_app.py
 3. Open `http://127.0.0.1:5000/fortnite` in your browser.
 
 If you do not have a Fortnite API key, the app still shows sample progress so the dashboard works while you configure a provider.
+ 
+### GitHub Pages (static preview)
 
+This repository includes a static preview of the Fortnite frontend in the `docs/` folder. The static preview runs entirely on GitHub Pages and shows sample progress data.
+
+To publish the static preview on GitHub Pages:
+
+1. In GitHub, open your repository's **Settings > Pages**.
+2. Under "Source", choose the `master` branch and the `/docs` folder, then save.
+3. The site will be available at `https://<your-github-username>.github.io/<repo-name>/` (or at your custom domain if configured).
+
+To use a custom domain with GitHub Pages:
+
+1. Replace the `docs/CNAME` file contents with your domain (for example `example.com`).
+2. In your DNS provider, create a CNAME record for `www` pointing to `<your-github-username>.github.io`, and optionally create A records for the apex domain as described in GitHub Pages docs.
+
+Note: The static preview does not include the Flask backend. For live Fortnite progress you must deploy the Flask app to a server (Render, Railway, Fly, etc.) and point the frontend to that API.
 ## API configuration
 This app needs credentials for eBay and TCGplayer:
 - `EBAY_CLIENT_ID`

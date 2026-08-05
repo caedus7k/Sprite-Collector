@@ -1,0 +1,20 @@
+[
+    {
+        "id": "shadow-pulse",
+        "name": "Shadow Pulse",
+        "status": "released",
+        "image": "/spritecollector/docs/sprites/shadow-pulse.svg"
+    },
+    {
+        "id": "solar-flare",
+        "name": "Solar Flare",
+        "status": "released",
+        "image": "/spritecollector/docs/sprites/solar-flare.svg"
+    },
+    {
+        "id": "neon-dawn",
+        "name": "Neon Dawn",
+        "status": "planned",
+        "image": "/spritecollector/docs/sprites/neon-dawn.svg"
+    }
+]

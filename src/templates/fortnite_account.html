@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Account - Sprite Collector</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:#eef2ff;padding:2rem}
+    .card{max-width:520px;margin:auto;background:#11182e;padding:1.5rem;border-radius:12px;border:1px solid #253c6c}
+    input{width:100%;padding:.8rem;margin:.5rem 0;border-radius:8px;border:1px solid #2b4c93;background:#121b32;color:#eef2ff}
+    button{padding:.8rem 1rem;border-radius:8px;border:none;background:#3b73ff;color:#fff;cursor:pointer}
+    .row{display:flex;gap:.5rem}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Account</h2>
+    {% if user %}
+      <p>Signed in as <strong>{{ user }}</strong></p>
+      <p><button id="logout">Sign out</button></p>
+    {% else %}
+      <h3>Register</h3>
+      <input id="reg-username" placeholder="username">
+      <input id="reg-password" placeholder="password" type="password">
+      <p><button id="register">Create account</button></p>
+
+      <h3>Login</h3>
+      <input id="login-username" placeholder="username">
+      <input id="login-password" placeholder="password" type="password">
+      <p><button id="login">Sign in</button></p>
+    {% endif %}
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    const msg = document.getElementById('msg');
+    document.getElementById('register')?.addEventListener('click', async () => {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      if (!username || !password) { msg.textContent = 'Enter username and password'; return }
+      const res = await fetch('/fortnite/api/user/register', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username,password})});
+      const j = await res.json();
+      if (res.ok) { location.href='/fortnite/dashboard' } else { msg.textContent = j.error || 'Error' }
+    });
+
+    document.getElementById('login')?.addEventListener('click', async () => {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      if (!username || !password) { msg.textContent = 'Enter username and password'; return }
+      const res = await fetch('/fortnite/api/user/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username,password})});
+      const j = await res.json();
+      if (res.ok) { location.href='/fortnite/dashboard' } else { msg.textContent = j.error || 'Error' }
+    });
+
+    document.getElementById('logout')?.addEventListener('click', async () => {
+      await fetch('/fortnite/api/user/logout');
+      location.href='/fortnite/dashboard';
+    });
+  </script>
+</body>
+</html>
