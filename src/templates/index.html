@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Collector Sales Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f2f4f7;
+            color: #1a202c;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .search-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-box input,
+        .search-box select {
+            flex: 1 1 240px;
+            padding: 0.85rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .search-box button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.85rem 1.4rem;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background: #1d4ed8;
+        }
+
+        .notice {
+            padding: 1rem;
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 1rem;
+        }
+
+        .error {
+            padding: 1rem;
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            margin-bottom: 1rem;
+        }
+
+        .small {
+            font-size: 0.95rem;
+            color: #475569;
+        }
+
+        a {
+            color: #2563eb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Collector Sales Data</h1>
+        <p class="small">Search eBay and TCGplayer sales data for cards, collectibles, toys, and more.</p>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/search" method="post" class="search-box">
+            <input type="text" name="query" placeholder="Search term (example: " Charizard" or "Vintage baseball card"
+                )" value="{{ query or '' }}" required />
+            <select name="marketplace">
+                <option value="all">All marketplaces</option>
+                <option value="ebay" {% if marketplace=='ebay' %}selected{% endif %}>eBay only</option>
+                <option value="tcgplayer" {% if marketplace=='tcgplayer' %}selected{% endif %}>TCGplayer only</option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="notice">
+            <strong>Note:</strong> This app uses API credentials from environment variables. Set them in a
+            <code>.env</code> file or in your environment.
+        </div>
+
+        <p class="small">See <code>README.md</code> for setup instructions and required API keys.</p>
+    </div>
+</body>
+
+</html>

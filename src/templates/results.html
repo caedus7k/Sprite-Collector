@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Collector Sales Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f2f4f7;
+            color: #1a202c;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .summary a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .market-section {
+            margin-top: 1.5rem;
+        }
+
+        .market-section h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .card p {
+            margin: 0.35rem 0;
+            font-size: 0.95rem;
+        }
+
+        .card a {
+            color: #2563eb;
+            word-break: break-word;
+        }
+
+        .error {
+            padding: 1rem;
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="summary">
+            <div>
+                <h1>Search results for "{{ query }}"</h1>
+                <p class="small">Choose a different search term or return to the home page.</p>
+            </div>
+            <a href="/">New search</a>
+        </div>
+
+        {% if errors %}
+        <div class="error">
+            <strong>One or more marketplaces returned errors.</strong>
+            <ul>
+                {% for item in errors %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% for marketplace, items in results.items() %}
+        <div class="market-section">
+            <h2>{{ marketplace|capitalize }} listings</h2>
+            {% if items %}
+            <div class="grid">
+                {% for item in items %}
+                <div class="card">
+                    <h3>{{ item.title or item.name }}</h3>
+                    {% if item.set_name %}<p><strong>Set / Group:</strong> {{ item.set_name }}</p>{% endif %}
+                    {% if item.condition %}<p><strong>Condition:</strong> {{ item.condition }}</p>{% endif %}
+                    {% if item.price %}<p><strong>Price:</strong> {{ item.price }} {{ item.currency or '' }}</p>{% endif
+                    %}
+                    {% if item.market_price %}<p><strong>Market price:</strong> {{ item.market_price }}</p>{% endif %}
+                    {% if item.avg_price %}<p><strong>Avg price:</strong> {{ item.avg_price }}</p>{% endif %}
+                    {% if item.url or item.item_url %}
+                    <p><a href="{{ item.url or item.item_url }}" target="_blank" rel="noreferrer">View listing</a></p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No results found for {{ marketplace|capitalize }}.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>

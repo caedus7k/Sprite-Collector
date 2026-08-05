@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fortnite Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #081024, #131b41 80%);
+            color: #eef2ff;
+            margin: 0;
+            padding: 1rem;
+        }
+        .page {
+            max-width: 940px;
+            margin: auto;
+            padding: 1.5rem;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        .badge {
+            background: #152a66;
+            color: #cbd7ff;
+            border-radius: 999px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #3b5db3;
+        }
+        .card {
+            background: rgba(15, 25, 52, 0.95);
+            border: 1px solid #2c528c;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+        }
+        .grid {
+            display: grid;
+            gap: 1.2rem;
+        }
+        .grid.columns-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .metric {
+            font-size: 0.95rem;
+            color: #a6c2ff;
+        }
+        .metric strong {
+            display: block;
+            font-size: 1.7rem;
+            margin-top: 0.25rem;
+            color: #fff;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #16264b;
+            border-radius: 999px;
+            overflow: hidden;
+            height: 1.1rem;
+            margin-top: 0.75rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #46b9ff, #7a5dff);
+            border-radius: inherit;
+        }
+        .button-row {
+            display: flex;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        button {
+            border: none;
+            padding: 0.9rem 1.3rem;
+            border-radius: 999px;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #eef2ff;
+            background: #3b73ff;
+            box-shadow: 0 12px 25px rgba(55, 115, 255, 0.25);
+        }
+        .note {
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 16px;
+            border: 1px solid #2a4c84;
+            background: rgba(18, 30, 60, 0.9);
+            color: #c8d8ff;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: #ffb3b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div>
+                <h1>Fortnite Progress Dashboard</h1>
+                <div class="badge">Logged in as {{ epic_username }} / {{ platform.upper() }}</div>
+            </div>
+            <div class="button-row">
+                <button id="refresh-button" type="button">Refresh progress</button>
+                <a href="{{ url_for('fortnite_logout') }}"><button type="button">Logout</button></a>
+            </div>
+        </header>
+
+        <div class="card">
+            <div class="grid columns-2">
+                <div class="metric">
+                    <span>Current Level</span>
+                    <strong id="level-value">—</strong>
+                </div>
+                <div class="metric">
+                    <span>Battle Pass Tier</span>
+                    <strong id="battlepass-value">—</strong>
+                </div>
+                <div class="metric">
+                    <span>Sprite Progress</span>
+                    <strong id="sprite-value">—</strong>
+                </div>
+                <div class="metric">
+                    <span>XP to next reward</span>
+                    <strong id="xp-value">—</strong>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                    <div style="min-width: 220px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
+                            <span>Sprite completion</span>
+                            <span id="sprite-progress-label">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="sprite-progress" class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div style="min-width: 220px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
+                            <span>Battle Pass readiness</span>
+                            <span id="battlepass-progress-label">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="battlepass-progress" class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note" id="note-area">
+                Loading your Fortnite progress... Please wait.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const refreshButton = document.getElementById("refresh-button");
+        const noteArea = document.getElementById("note-area");
+        const levelValue = document.getElementById("level-value");
+        const battlePassValue = document.getElementById("battlepass-value");
+        const spriteValue = document.getElementById("sprite-value");
+        const xpValue = document.getElementById("xp-value");
+        const spriteProgress = document.getElementById("sprite-progress");
+        const spriteProgressLabel = document.getElementById("sprite-progress-label");
+        const battlePassProgress = document.getElementById("battlepass-progress");
+        const battlePassProgressLabel = document.getElementById("battlepass-progress-label");
+
+        async function loadProgress() {
+            noteArea.textContent = "Fetching the latest progress from Fortnite...";
+            try {
+                const response = await fetch("{{ url_for('fortnite_api_progress') }}");
+                const data = await response.json();
+
+                if (data.error) {
+                    noteArea.innerHTML = `<span class="error">${data.error}</span>`;
+                    return;
+                }
+
+                levelValue.textContent = data.level;
+                battlePassValue.textContent = data.battle_pass_tier;
+                spriteValue.textContent = `${data.sprite_name} (${data.sprite_progress}%)`;
+                xpValue.textContent = data.xp_to_next;
+
+                const spritePct = Math.min(100, Math.max(0, data.sprite_progress));
+                spriteProgress.style.width = spritePct + "%";
+                spriteProgressLabel.textContent = spritePct + "%";
+
+                const battlePct = Math.min(100, Math.max(0, Math.round(data.battle_pass_tier / 100 * 100)));
+                battlePassProgress.style.width = battlePct + "%";
+                battlePassProgressLabel.textContent = battlePct + "%";
+
+                noteArea.textContent = data.note || "Progress updated successfully.";
+            } catch (error) {
+                noteArea.innerHTML = `<span class="error">Unable to load progress. ${error}</span>`;
+            }
+        }
+
+        refreshButton.addEventListener("click", loadProgress);
+        loadProgress();
+        setInterval(loadProgress, 15000);
+    </script>
+</body>
+</html>
