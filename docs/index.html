@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Fortnite Sprite Progress — Static Preview</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1220;
+            color: #f4f7ff;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center
+        }
+
+        .card {
+            max-width: 720px;
+            background: #11182e;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #253c6c
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: .9rem;
+            border-radius: 8px;
+            border: 1px solid #2b4c93;
+            background: #121b32;
+            color: #eef2ff;
+            margin-top: .5rem
+        }
+
+        button {
+            background: linear-gradient(135deg, #6d8bff, #2179ff);
+            border: none;
+            font-weight: 700;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>Fortnite Sprite Progress — Static Preview</h1>
+        <p>This static preview runs on GitHub Pages. For live progress you need the backend running elsewhere.</p>
+        <form id="login-form">
+            <label for="epic_username">Epic display name</label>
+            <input id="epic_username" name="epic_username" type="text" placeholder="Enter your Epic name" required>
+
+            <label for="platform">Platform</label>
+            <select id="platform" name="platform">
+                <option value="pc">Epic / PC</option>
+                <option value="psn">PlayStation</option>
+                <option value="xbl">Xbox</option>
+            </select>
+
+            <button type="submit">View progress (static)</button>
+        </form>
+
+        <p style="margin-top:1rem;font-size:.95rem;color:#9bb2ff">To connect to live Fortnite data, deploy the Flask
+            backend and set a custom domain or use the full project repo.</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('epic_username').value.trim();
+            const platform = document.getElementById('platform').value;
+            if (!username) return alert('Enter a display name');
+            localStorage.setItem('epic_username', username);
+            localStorage.setItem('platform', platform);
+            location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+
+</html>

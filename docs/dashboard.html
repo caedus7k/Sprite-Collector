@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Fortnite Dashboard — Static Preview</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#081024,#131b41);color:#eef2ff;margin:0;padding:2rem}
+    .page{max-width:940px;margin:auto}
+    .card{background:rgba(15,25,52,.95);padding:1.5rem;border-radius:12px;border:1px solid #2c528c}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+    .metric{color:#a6c2ff}
+    .progress-bar{background:#16264b;border-radius:999px;height:1.1rem;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#46b9ff,#7a5dff)}
+    button{background:#3b73ff;border:none;padding:.6rem 1rem;border-radius:999px;color:#fff;cursor:pointer}
+    .note{background:rgba(18,30,60,.9);padding:1rem;border-radius:10px;margin-top:1rem}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+      <h1>Fortnite Progress (Static)</h1>
+      <div>
+        <button id="back">Back</button>
+      </div>
+    </header>
+
+    <div class="card" style="margin-top:1rem">
+      <div class="grid">
+        <div class="metric">Current Level<br><strong id="level">—</strong></div>
+        <div class="metric">Battle Pass Tier<br><strong id="bp">—</strong></div>
+        <div class="metric">Sprite Progress<br><strong id="sprite">—</strong></div>
+        <div class="metric">XP to next<br><strong id="xp">—</strong></div>
+      </div>
+
+      <div style="margin-top:1rem">
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <div style="min-width:220px">
+            <div style="display:flex;justify-content:space-between"><span>Sprite completion</span><span id="sprite-label">0%</span></div>
+            <div class="progress-bar"><div id="sprite-bar" class="progress-fill" style="width:0%"></div></div>
+          </div>
+          <div style="min-width:220px">
+            <div style="display:flex;justify-content:space-between"><span>Battle Pass readiness</span><span id="bp-label">0%</span></div>
+            <div class="progress-bar"><div id="bp-bar" class="progress-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note" id="note">This is a static preview. For live data, run the Flask backend.</div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('back').addEventListener('click', () => location.href='index.html');
+
+    const sample = {
+      source: 'sample', display_name: localStorage.getItem('epic_username') || 'Player', platform: localStorage.getItem('platform') || 'pc',
+      level: 72, battle_pass_tier: 85, sprite_name: 'Shadow Pulse', sprite_progress: 56, xp_to_next: 14230, note: 'Static preview data.'
+    };
+
+    function render(data){
+      document.getElementById('level').textContent = data.level;
+      document.getElementById('bp').textContent = data.battle_pass_tier;
+      document.getElementById('sprite').textContent = data.sprite_name + ' ('+data.sprite_progress+'%)';
+      document.getElementById('xp').textContent = data.xp_to_next;
+      const sp = Math.max(0, Math.min(100, data.sprite_progress));
+      document.getElementById('sprite-bar').style.width = sp + '%';
+      document.getElementById('sprite-label').textContent = sp + '%';
+      const bpPct = Math.max(0, Math.min(100, Math.round(data.battle_pass_tier / 100 * 100)));
+      document.getElementById('bp-bar').style.width = bpPct + '%';
+      document.getElementById('bp-label').textContent = bpPct + '%';
+      document.getElementById('note').textContent = data.note;
+    }
+
+    render(sample);
+  </script>
+</body>
+</html>
