@@ -10,6 +10,7 @@ venv/
 
 # Environment files
 .env
+fortnite_data.db
 
 # Editor files
 .vscode/

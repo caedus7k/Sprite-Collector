@@ -62,6 +62,28 @@ To use a custom domain with GitHub Pages:
 2. In your DNS provider, create a CNAME record for `www` pointing to `<your-github-username>.github.io`, and optionally create A records for the apex domain as described in GitHub Pages docs.
 
 Note: The static preview does not include the Flask backend. For live Fortnite progress you must deploy the Flask app to a server (Render, Railway, Fly, etc.) and point the frontend to that API.
+
+## Deploy the backend to Render
+The full Sprite Collector backend is a Flask app in `src/fortnite_app.py`. You can deploy it to Render so the app is hosted with an HTTPS endpoint and saves user sprite choices.
+
+1. Create a Render account at https://render.com.
+2. Add a new **Web Service** and connect your GitHub repository.
+3. Set the branch to `master` and the root to this repository.
+4. Use these commands:
+   - Build command: `pip install -r requirements.txt`
+   - Start command: `python src/fortnite_app.py`
+5. Add environment variables in Render:
+   - `FLASK_SECRET_KEY`
+   - `FORTNITE_API_KEY` (optional for live Fortnite progress)
+   - `EBAY_CLIENT_ID` and `EBAY_CLIENT_SECRET` (optional, if you use eBay features)
+   - `TCGPLAYER_CLIENT_ID` and `TCGPLAYER_CLIENT_SECRET` (optional, if you use TCGplayer features)
+6. (Optional) Add a custom domain in Render once the service is live.
+
+If you want to use the full backend instead of the GitHub Pages preview, access Render's generated service URL and point your app there.
+
+## Backend deployment files
+This repository includes a `Procfile` and a `render.yaml` file so Render can start the Flask backend automatically.
+
 ## API configuration
 This app needs credentials for eBay and TCGplayer:
 - `EBAY_CLIENT_ID`
